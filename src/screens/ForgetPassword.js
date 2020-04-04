@@ -94,6 +94,7 @@ class ForgetPassword extends Component {
 				step1Error: false,
 				firstName: data.firstName,
 				lastName: data.lastName,
+				apiMessage: ''
 			})
 
 			if (data.challengeQuestions === undefined || data.challengeQuestions.length === 0) {
@@ -158,7 +159,9 @@ class ForgetPassword extends Component {
 	handlePreBtnClick = () => {
 		this.setState({
 			step1Show: true,
-			currentStep: 0
+			currentStep: 0,
+			apiMessage: '',
+			errorMessage: ''
 		})
 	}
 
@@ -228,13 +231,13 @@ class ForgetPassword extends Component {
 			return (
 				<Fragment>
 					<Col md={6} sm={12}>
-						<Col md={12}>
+						<Col md='10' lg='8' xl='6'>
 							<label>
 								<span className='star-color'>*</span>
 								Payroll ID:
 							</label>
 						</Col>
-						<Col md={12}>
+						<Col md='10' lg='8' xl='6'>
 							<Form.Control
 								value={userName}
 								onChange={this.handleUserNameChange}
@@ -242,7 +245,7 @@ class ForgetPassword extends Component {
 								size="sm"
 							/>
 						</Col>
-						<Col md={12} className="text-danger font-italic cursor-pointer">
+						<Col md='10' lg='8' xl='6' className="text-danger font-italic cursor-pointer">
 							<p onClick={this.handleCheckShow}>
 								(Need help to find your ID Number?)
 							</p>
@@ -263,15 +266,18 @@ class ForgetPassword extends Component {
 			return (
 				<Fragment>
 					<Col md={12}>
-						<h4>
-							Answer the following question
-							<span style={{ fontStyle: 'italic', fontSize: '12px', marginLeft: '10px' }}>
-								(answers are not case-sensitive)
-							</span>
-						</h4>
+
 						<Row>
 							<Col md='6' sm='12'>
-								<Col md='12' style={{marginBottom: 5}}>
+
+								<h5 className="p-0">
+									Answer the following question
+									<span style={{ fontStyle: 'italic', fontSize: '12px', marginLeft: '10px' }}>
+										(answers are not case-sensitive)
+									</span>
+								</h5>
+
+								<Col md='10' lg='8' xl='6' style={{marginBottom: 5}}>
 									<span>
 										{questions[questionNum]}
 										<span
@@ -282,7 +288,7 @@ class ForgetPassword extends Component {
 									</span>
 								</Col>
 
-								<Col md='12'>
+								<Col md='10' lg='8' xl='6'>
 									<FormGroup controlId="formControlsSelect">
 										<Form.Control
 											value={answer}
@@ -294,7 +300,7 @@ class ForgetPassword extends Component {
 									</FormGroup>
 								</Col>
 
-								<Col md='12'>
+								<Col md='10' lg='8' xl='6'>
 									<FormGroup controlId="formControlsSelect">
 										<label>
 											<span className='star-color'>*</span>
@@ -310,7 +316,7 @@ class ForgetPassword extends Component {
 									</FormGroup>
 								</Col>
 
-								<Col md='12'>
+								<Col md='10' lg='8' xl='6'>
 									<FormGroup controlId="formControlsSelect">
 										<label>
 											<span className='star-color'>*</span>
@@ -330,10 +336,10 @@ class ForgetPassword extends Component {
 							<Col md='1'/>
 							<Col md='5' sm='12' >
 								<PasswordPolicy 
-									password={password}
-									firstName={firstName}
-									lastName={lastName}
-									userName={userName}
+									password={password || ''}
+									firstName={firstName || ''}
+									lastName={lastName || ''}
+									userName={userName || ''}
 									style={this.style.listitem}
 								/>
 							</Col>

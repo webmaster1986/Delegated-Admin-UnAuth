@@ -28,7 +28,7 @@ const axiosInstance = axios.create({
 //         "What is your oldest sibling's birth month and year?"
 //     ],
 //     "email": "Deepa.George@fdny.nyc.gov",
-//     "firstName": "DEEPA ",
+//     "firstName": "DEEPA",
 //     "lastName": "GEORGE",
 //     "userId": "11111",
 //     "userLogin": "N1111111"
@@ -55,6 +55,26 @@ export class ApiService {
         return data || response.data;
     }
 
+    static async postMethod(url, data, headers, cancelToken) {
+        const config = {
+            headers: {
+                ...(headers || {})
+            }
+        };
+        if (cancelToken && cancelToken.token) {
+            config.cancelToken = cancelToken.token;
+        }
+        let resData = '';
+        const response = await axiosInstance.post(url, data, config).catch(thrown => {
+            if (thrown.toString() === 'Cancel') {
+                resData = 'cancel';
+            } else {
+                resData = {error: (thrown && thrown.response && thrown.response.data && thrown.response.data.message) || 'An error has occurred'};;
+            }
+        });
+        return resData || response.data;
+    }
+
     static async putMethod(url, data, headers, cancelToken) {
         const config = {
             headers: {
@@ -78,6 +98,7 @@ export class ApiService {
     async getUserInformation(userName) {
         // return userInfo
         // return await ApiService.getData(`GetUserInfo.json`);
+        // return userName === "1234567" ? await ApiService.getData(`/SelfService/webapi/unauthapi/userInformation?userName=${userName || ''}`) : userInfo;
         return await ApiService.getData(`/SelfService/webapi/unauthapi/userInformation?userName=${userName || ''}`);
     }
 
@@ -90,6 +111,6 @@ export class ApiService {
 
     async updateClaim(payload) {
         // return {"status":"completed","userId":"NA11111"}
-        return await ApiService.putMethod(`/SelfService/webapi/unauthapi/claim`, payload);
+        return await ApiService.postMethod(`/SelfService/webapi/unauthapi/claim`, payload);
     }
 }

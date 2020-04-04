@@ -34,6 +34,7 @@ class Header extends Component {
     const envMode =  this.getReactAppEnv();
     const className = envMode === 'dev' ? 'green-banner' : envMode === 'tst' ? 'blue-banner' : envMode === 'stg' ? 'purple-banner' : 'red-banner';
     const { pathname } = this.props.location
+    const pathArray = (pathname || "").includes("password-reset") || (pathname || "").includes("claim-account")
     return (
       <div
         className={`header-nav ${className}`}
@@ -52,7 +53,7 @@ class Header extends Component {
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="mr-auto desktop-menu">
                 <ul className="nav">
-                  { (pathname || "").includes("password-reset") ? null :
+                  { pathArray ? null :
                     <li>
                       <Nav.Item>
                         <Link
@@ -64,7 +65,7 @@ class Header extends Component {
                       </Nav.Item>
                     </li>
                   }
-                  { (pathname || "").includes("claim-account") ? null :
+                  { pathArray ? null :
                     <li>
                       <Nav.Item>
                         <Link

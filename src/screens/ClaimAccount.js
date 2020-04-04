@@ -367,10 +367,8 @@ class ClaimAccount extends React.Component {
     const {errorMessage, firstName, lastName, userLogin, dob, last4ofSSN,
       password, confirmPassword, challenges, allChallengeQuestions, afterSubmit, currentStep} = this.state;
 
-    let isPwdPass = !password &&
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])[A-Za-z\d$@#$!%*?&]{8,}/.test(userLogin) &&
-      !password.includes(firstName) && !password.includes(lastName) && !password.includes(userLogin) &&
-      /[A-Za-z]/.test(password.substring(0, 1));
+    const isPwdPassValidate = !password || password.includes(firstName) ||  password.includes(lastName) || !/(.*[a-zA-Z]){2,}/.test(password) || password.length < 8 || !/(.*[a-z]){1,}/.test(password) || !/(.*[0-9]){1,}/.test(password) ||
+        !/(.*[$#@$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin)
 
     let message = null;
     if (errorMessage && Object.keys(errorMessage).length) {
@@ -387,10 +385,10 @@ class ClaimAccount extends React.Component {
         <Row>
           <Col md={12} sm={12}>
             <Steps current={currentStep}>
-              <Step title="Basic Information" onClick={currentStep >= 0 ? () => this.setState({currentStep: 0}) : () => {}}/>
-              <Step title="Setup Security Questions" onClick={currentStep >= 1 ? () => this.setState({currentStep: 1}) : () => {}}/>
-              <Step title="Set Password" onClick={currentStep >= 2 ? () => this.setState({currentStep: 2}) : () => {}}/>
-              <Step title="Review" onClick={currentStep >= 3 ? () => this.setState({currentStep: 3}) : () => {}}/>
+              <Step title="Basic Information" onClick={currentStep >= 0 ? () => this.setState({currentStep: 0, confirmPassword: '', password: ''}) : () => {}}/>
+              <Step title="Setup Security Questions" onClick={currentStep >= 1 ? () => this.setState({currentStep: 1, confirmPassword: '', password: ''}) : () => {}}/>
+              <Step title="Set Password" onClick={currentStep >= 2 ? () => this.setState({currentStep: 2, confirmPassword: '', password: ''}) : () => {}}/>
+              <Step title="Review" onClick={currentStep >= 3 ? () => this.setState({currentStep: 3, confirmPassword: '', password: ''}) : () => {}}/>
             </Steps>
           </Col>
 
@@ -406,7 +404,7 @@ class ClaimAccount extends React.Component {
                     <Form.Label column md="4">
                       <span className='star-color'>*</span>User Login
                     </Form.Label>
-                    <Col md="8">
+                    <Col md='8' lg='6' xl='5'>
                       <Form.Control
                           value={userLogin}
                           name="userLogin"
@@ -423,7 +421,7 @@ class ClaimAccount extends React.Component {
                     <Form.Label column md="4">
                       <span className='star-color'>*</span>First Name
                     </Form.Label>
-                    <Col md="8">
+                    <Col md='8' lg='6' xl='5'>
                       <Form.Control
                           value={firstName}
                           name="firstName"
@@ -440,7 +438,7 @@ class ClaimAccount extends React.Component {
                     <Form.Label column md="4">
                       <span className='star-color'>*</span>Last Name
                     </Form.Label>
-                    <Col md="8">
+                    <Col md='8' lg='6' xl='5'>
                       <Form.Control
                           value={lastName}
                           name="lastName"
@@ -457,7 +455,7 @@ class ClaimAccount extends React.Component {
                     <Form.Label column md="4">
                       <span className='star-color'>*</span>Date of Birth
                     </Form.Label>
-                    <Col md="8">
+                    <Col md='8' lg='6' xl='5'>
                       {
                         !isViewMode ?
                           <DatePicker
@@ -482,7 +480,7 @@ class ClaimAccount extends React.Component {
                     <Form.Label column md="4">
                       <span className='star-color'>*</span>SSN
                     </Form.Label>
-                    <Col md="8">
+                    <Col md='8' lg='6' xl='5'>
                       <Form.Control
                           value={last4ofSSN}
                           name="last4ofSSN"
@@ -516,15 +514,17 @@ class ClaimAccount extends React.Component {
                             <span className='star-color'>*</span>
                             Password
                           </label>
-                          <Form.Control
-                            type="password"
-                            placeholder=""
-                            value={password}
-                            name="password"
-                            onChange={this.handleChange}
-                            size="sm"
-                          />
-                          <span className='error-text'>{password && !isPwdPass && 'Please follow the password policy.'}</span>
+                          <Col md='8' lg='6' xl='5' className='pl-0'>
+                            <Form.Control
+                              type="password"
+                              placeholder=""
+                              value={password}
+                              name="password"
+                              onChange={this.handleChange}
+                              size="sm"
+                            />
+                          </Col>
+                          <span className='error-text'>{password && isPwdPassValidate && 'Please follow the password policy.'}</span>
                         </FormGroup>
                       </Form>
 
@@ -534,96 +534,29 @@ class ClaimAccount extends React.Component {
                             <span className='star-color'>*</span>
                             Confirm Password
                           </label>
-                          <Form.Control
-                            type="password"
-                            placeholder=""
-                            value={confirmPassword}
-                            name="confirmPassword"
-                            onChange={this.handleChange}
-                            size="sm"
-                          />
+                          <Col md='8' lg='6' xl='5' className='pl-0'>
+                            <Form.Control
+                              type="password"
+                              placeholder=""
+                              value={confirmPassword}
+                              name="confirmPassword"
+                              onChange={this.handleChange}
+                              size="sm"
+                            />
+                          </Col>
                           <span className='error-text'>{confirmPassword && confirmPassword !== password && "Passwords don't match."}</span>
                         </FormGroup>
                       </Form>
 
-                     {/* <Form as={Row} >
-                        <Form.Label column md="4">
-                          <span className='star-color'>*</span>Password
-                        </Form.Label>
-                        <Col md="8">
-                          <Form.Control
-                            type="password"
-                            placeholder=""
-                            value={password}
-                            name="password"
-                            onChange={this.handleChange}
-                            size="sm"
-                          />
-                          <span className='error-text'>{password && !isPwdPass && 'Please follow the password policy.'}</span>
-                        </Col>
-                      </Form>
-
-                      <Form as={Row} >
-                        <Form.Label column md="4">
-                          <span className='star-color'>*</span>Confirm Password
-                        </Form.Label>
-                        <Col md="8">
-                          <Form.Control
-                            type="password"
-                            placeholder=""
-                            value={confirmPassword}
-                            name="confirmPassword"
-                            onChange={this.handleChange}
-                            size="sm"
-                          />
-                          <span className='error-text'>{confirmPassword && confirmPassword !== password && "Passwords don't match."}</span>
-                        </Col>
-                      </Form>*/}
-
-
-                      {/*<Row>
-                        <Col md={4}>
-                          <Form.Label>
-                            <span className='star-color'>*</span>
-                            Password
-                          </Form.Label>
-                        </Col>
-                        <Col md={8}>
-                          <Form.Control
-                            type="password"
-                            placeholder=""
-                            value={password}
-                            name="password"
-                            onChange={this.handleChange}
-                          />
-                        </Col>
-                        <Col md={4}/>
-                        <Col md={8} className='error-text padding-bottom'>{password && !isPwdPass && 'Please follow the password policy.'}</Col>
-                      </Row>
-                      <Row>
-                        <Col md={4}>
-                          <Form.Label>
-                            <span className='star-color'>*</span>
-                            Confirm Password
-                          </Form.Label>
-                        </Col>
-                        <Col md={8}>
-                          <Form.Control type="password" placeholder="" value={confirmPassword} name="confirmPassword"
-                                        onChange={this.handleChange}
-                          />
-                        </Col>
-                        <Col md={4}/>
-                        <Col md={8} className='error-text padding-bottom'>{confirmPassword && confirmPassword !== password && "Passwords don't match."}</Col>
-                      </Row>*/}
                     </div>
                   </Col>
                   <Col md={1}/>
                   <Col md={5} sm={12}>
                     <PasswordPolicy
                         password={password}
-                        firstName={firstName}
-                        lastName={lastName}
-                        userLogin={userLogin}
+                        firstName={(firstName || "").toUpperCase()}
+                        lastName={(lastName || "").toUpperCase()}
+                        userName={(userLogin || "").toUpperCase()}
                         style={this.style.listitem}
                     />
                   </Col>
@@ -681,7 +614,7 @@ class ClaimAccount extends React.Component {
                   return (
                     <span key={i.toString() + i}>
                       <Row>
-                        <Col xs='12' md='8' lg='6' xl='5'>
+                        <Col xs='12' md='8' lg='6' xl='4'>
                           <FormGroup controlId="formControlsSelect">
                             <label>
                               {`Question ${i + 1}`}
@@ -692,7 +625,7 @@ class ClaimAccount extends React.Component {
                                 value={data && data.challenge}
                                 size="sm"
                             >
-                              {allChallengeQuestions.filter(item => item !== challenges[i === 0 ? 1 : i === 1 ? 0 : 0].challenge && item !== challenges[i === 0 ? 1 : i === 1 ? 2 : 1].challenge)
+                              {allChallengeQuestions.filter(item => item !== challenges[i === 0 ? 1 : i === 1 ? 0 : 0].challenge && item !== challenges[i === 0 ? 2 : i === 1 ? 2 : 1].challenge)
                                   .map(item => <option key={item}>{item}</option>)}
                             </Form.Control>
                           </FormGroup>
@@ -701,7 +634,7 @@ class ClaimAccount extends React.Component {
                       {
                         isViewMode ? null :
                           <Row className='pb-20'>
-                            <Col xs='12' md='8' lg='6' xl='5'>
+                            <Col xs='12' md='8' lg='6' xl='4'>
                               <FormGroup controlId="formControlsSelect">
                                 <label>
                                   <span className='star-color'>*</span>
@@ -732,7 +665,7 @@ class ClaimAccount extends React.Component {
 
         <div className="justify-content-between d-flex">
           { currentStep === 0 ? <div/> :
-              <button type="button" className="btn btn-light btn-md" disabled={currentStep === 0}
+              <button type="button" className="btn btn-info btn-md" disabled={currentStep === 0}
                       onClick={() => this.onStepChange(currentStep - 1)}>
                 Back
               </button>
@@ -760,7 +693,7 @@ class ClaimAccount extends React.Component {
                 { afterSubmit ? <div className="spinner-border spinner-border-sm text-dark"/> : null }
                 {' '} Submit
               </button> :
-              <button type="button" className="btn btn-primary btn-md" onClick={() => this.onValidationCheck(currentStep + 1)}>
+              <button type="button" className="btn btn-primary btn-md" onClick={() => this.onValidationCheck(currentStep + 1)} disabled={currentStep === 2 ? (isPwdPassValidate || !confirmPassword || confirmPassword !== password) : false}>
                 Next
               </button>
             }
