@@ -4,6 +4,7 @@ import {Container} from 'react-bootstrap';
 
 import ClaimAccount from "./screens/ClaimAccount";
 import ForgetPassword from "./screens/ForgetPassword";
+import Success from "./screens/Success";
 // import Registration from "./screens/Registration";
 
 import Header from './components/Header';
@@ -19,6 +20,7 @@ const App  = () => (
        <React.Fragment>
          <Route path='/SelfService/unauth/claim-account' component={ClaimAccount}/>
          <Route path='/SelfService/unauth/password-reset' component={ForgetPassword} />
+         <Route path='/SelfService/unauth/success' component={Success}/>
        </React.Fragment>
      </Switch>
      <Footer/>

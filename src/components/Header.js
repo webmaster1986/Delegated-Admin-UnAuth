@@ -4,7 +4,7 @@ import {
   Nav,
   Navbar
 } from 'react-bootstrap';
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import badge from '../components/images/FDNY.png';
 import MobileMenu from "./MobileMenu";
@@ -33,9 +33,10 @@ class Header extends Component {
   render() {
     const envMode =  this.getReactAppEnv();
     const className = envMode === 'dev' ? 'green-banner' : envMode === 'tst' ? 'blue-banner' : envMode === 'stg' ? 'purple-banner' : 'red-banner';
+    const { pathname } = this.props.location
     return (
       <div
-        className={`${className} header-nav`}
+        className={`header-nav ${className}`}
       >
         <Container>
           <Navbar collapseOnSelect expand="lg">
@@ -51,26 +52,30 @@ class Header extends Component {
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="mr-auto desktop-menu">
                 <ul className="nav">
-                  <li>
-                    <Nav.Item>
-                      <Link
-                        to="/SelfService/unauth/claim-account"
-                        className={'nav-link color-white'}
-                      >
-                        Claim Account
-                      </Link>
-                    </Nav.Item>
-                  </li>
-                  <li>
-                    <Nav.Item>
-                      <Link
-                        to="/SelfService/unauth/password-reset"
-                        className={'nav-link color-white'}
-                      >
-                        Reset Password
-                      </Link>
-                    </Nav.Item>
-                  </li>
+                  { (pathname || "").includes("password-reset") ? null :
+                    <li>
+                      <Nav.Item>
+                        <Link
+                          to="/SelfService/unauth/claim-account"
+                          className={'nav-link color-white'}
+                        >
+                          Claim Account
+                        </Link>
+                      </Nav.Item>
+                    </li>
+                  }
+                  { (pathname || "").includes("claim-account") ? null :
+                    <li>
+                      <Nav.Item>
+                        <Link
+                            to="/SelfService/unauth/password-reset"
+                            className={'nav-link color-white'}
+                        >
+                          Reset Password
+                        </Link>
+                      </Nav.Item>
+                    </li>
+                  }
                 </ul>
               </Nav>
               <MobileMenu/>
@@ -82,4 +87,4 @@ class Header extends Component {
   }
 }
 
-export default Header;
+export default withRouter(Header);

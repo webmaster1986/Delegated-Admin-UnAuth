@@ -4,48 +4,35 @@ const axiosInstance = axios.create({
     baseURL: apiEndPoint,
 });
 
-const questions = {
-    "challengeQuestions": [
-        "What is your mother's maiden name?",
-        "What is your favorite color?",
-        "What is the name of your pet?",
-        "What is the city of your birth?",
-        "What highschool did you attend?",
-        "In what city did you meet your spouse/significant other?",
-        "What was your childhood nickname?",
-        "What street did you live on in third grade?",
-        "What is the name of your favorite childhood friend?",
-        "What is your oldest sibling's birth month and year?",
-        "What is the middle name of your oldest child?",
-        "What is your oldest sibling's middle name?"
-    ]
-};
+// const data = {
+//     "challengeQuestions": [
+//         "What is your mother's maiden name?",
+//         "What is your favorite color?",
+//         "What is the name of your pet?",
+//         "What is the city of your birth?",
+//         "What highschool did you attend?",
+//         "In what city did you meet your spouse/significant other?",
+//         "What was your childhood nickname?",
+//         "What street did you live on in third grade?",
+//         "What is the name of your favorite childhood friend?",
+//         "What is your oldest sibling's birth month and year?",
+//         "What is the middle name of your oldest child?",
+//         "What is your oldest sibling's middle name?"
+//     ]
+// }
 
-const user = {
-    "userLogin": "123456",
-    "firstName": "User1",
-    "lastName": "Demo",
-    "dob": "12/08/1995",
-    "last4ofSSN": "12/22/2020",
-    "email": "test@gmail.com",
-    "middleName": "TestUser",
-    "password": "TestPassword",
-    "confirmPassword": "TestPassword",
-    "challengeQuestions": [
-        "What is your mother's maiden name?",
-        "What is your favorite color?",
-        "What is the name of your pet?",
-        "What is the city of your birth?",
-        "What highschool did you attend?",
-        "In what city did you meet your spouse/significant other?",
-        "What was your childhood nickname?",
-        "What street did you live on in third grade?",
-        "What is the name of your favorite childhood friend?",
-        "What is your oldest sibling's birth month and year?",
-        "What is the middle name of your oldest child?",
-        "What is your oldest sibling's middle name?"
-    ]
-};
+// const userInfo = {
+//     "challengeQuestions": [
+//         "Who was your fifth grade teacher?",
+//         "What street did you live on in third grade?",
+//         "What is your oldest sibling's birth month and year?"
+//     ],
+//     "email": "Deepa.George@fdny.nyc.gov",
+//     "firstName": "DEEPA ",
+//     "lastName": "GEORGE",
+//     "userId": "11111",
+//     "userLogin": "N1111111"
+// }
 
 export class ApiService {
 
@@ -89,17 +76,20 @@ export class ApiService {
     }
 
     async getUserInformation(userName) {
-        // return user
+        // return userInfo
+        // return await ApiService.getData(`GetUserInfo.json`);
         return await ApiService.getData(`/SelfService/webapi/unauthapi/userInformation?userName=${userName || ''}`);
     }
 
     /*  Security Question Page Services  */
     async getChallengeQuestions() {
-        // return questions;
+        // return data
+        // return await ApiService.getData(`GetQuestions.json`);
         return await ApiService.getData(`/SelfService/webapi/unauthapi/allChallengeQuestions`);
     }
 
     async updateClaim(payload) {
-        return await ApiService.putMethod(`/SelfService/webapi/authapi/claim`, payload);
+        // return {"status":"completed","userId":"NA11111"}
+        return await ApiService.putMethod(`/SelfService/webapi/unauthapi/claim`, payload);
     }
 }

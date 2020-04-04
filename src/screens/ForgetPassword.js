@@ -1,5 +1,5 @@
 import React, { Fragment, Component } from 'react';
-import { Container, Form, Row, Col } from 'react-bootstrap';
+import {Container, Form, Row, Col, FormGroup} from 'react-bootstrap';
 import axios from 'axios';
 
 import check from '../components/images/check.jpg';
@@ -7,6 +7,9 @@ import PasswordPolicy from '../components/PasswordPolicy';
 
 import 'react-block-ui/style.css';
 import {ApiService} from "../services/ApiService";
+import {Divider, Steps} from "antd";
+
+const { Step } = Steps
 
 const hostUrl = window.location.protocol+'//'+window.location.host;
 
@@ -17,6 +20,7 @@ class ForgetPassword extends Component {
 		super(props);
 		this.state = {
 			step1Show: true,
+			currentStep: 0,
 			firstName:'',
 			lastName:'',
 			userName: '',
@@ -85,6 +89,7 @@ class ForgetPassword extends Component {
 		}else {
 			this.setState({
 				step1Show: false,
+				currentStep: 1,
 				isLoaderShow: false,
 				step1Error: false,
 				firstName: data.firstName,
@@ -95,6 +100,7 @@ class ForgetPassword extends Component {
 				window.scrollTo(0, 0);
 				this.setState({
 					step1Show: true,
+					currentStep: 0,
 					step1Error: true,
 					apiMessage: 'Your security questions have not been setup. Please contact the helpdesk to reset your password.'
 				})
@@ -151,7 +157,8 @@ class ForgetPassword extends Component {
 
 	handlePreBtnClick = () => {
 		this.setState({
-			step1Show: true
+			step1Show: true,
+			currentStep: 0
 		})
 	}
 
@@ -160,7 +167,7 @@ class ForgetPassword extends Component {
 			isLoaderShow: true,
 			afterSubmit: true
 		})
-		var self = this;
+		const self = this;
 		let url = hostUrl+`/SelfService/webapi/unauthapi/resetPassword`
 		console.log(url)
 		const data = {
@@ -232,6 +239,7 @@ class ForgetPassword extends Component {
 								value={userName}
 								onChange={this.handleUserNameChange}
 								onBlur={this.handleUserNameBlur}
+								size="sm"
 							/>
 						</Col>
 						<Col md={12} className="text-danger font-italic cursor-pointer">
@@ -261,50 +269,66 @@ class ForgetPassword extends Component {
 								(answers are not case-sensitive)
 							</span>
 						</h4>
-						<Row className='padding-box'>
+						<Row>
 							<Col md='6' sm='12'>
-								<Col md='12'>
-									<p>
+								<Col md='12' style={{marginBottom: 5}}>
+									<span>
 										{questions[questionNum]}
 										<span
 											style={{ cursor: 'pointer', fontStyle: 'italic', fontSize: '12px', marginLeft: '10px', textDecorationLine: 'underline' }}
 											onClick={this.handleQuestionChange}
 										>Choose another question
 										</span>
-									</p>
-									<Form.Control
-										value={answer}
-										onChange={this.handleAnswerInput}
-										onBlur={this.handleAnswerBlur}
-									/>
-									<p className='error-text padding-bottom'>{ answerError && 'Answer is required.' }</p>
+									</span>
 								</Col>
+
 								<Col md='12'>
-									<label>
-										<span className='star-color'>*</span>
-										New Password
-									</label>
-									<Form.Control
-										type='password'
-										value={password}
-										onChange={this.handlePasswordInputChange}
-									/>
-									<p className='error-text padding-bottom'>{ password && !isPwdPass && 'Please follow the password policy.' }</p>
+									<FormGroup controlId="formControlsSelect">
+										<Form.Control
+											value={answer}
+											onChange={this.handleAnswerInput}
+											onBlur={this.handleAnswerBlur}
+											size="sm"
+										/>
+										<span className='error-text'>{ answerError && 'Answer is required.' }</span>
+									</FormGroup>
 								</Col>
+
 								<Col md='12'>
-									<label>
-										<span className='star-color'>*</span>
-										Confirm Password
-									</label>
-									<Form.Control
-										type='password'
-										value={confirmPassword}
-										onChange={this.handleConfirmPasswordInputChange}
-									/>
-									<p className='error-text padding-bottom'>{ confirmPassword !== password && "Passwords don't match." }</p>
+									<FormGroup controlId="formControlsSelect">
+										<label>
+											<span className='star-color'>*</span>
+											New Password
+										</label>
+										<Form.Control
+											type='password'
+											value={password}
+											onChange={this.handlePasswordInputChange}
+											size="sm"
+										/>
+										<span className='error-text'>{ password && !isPwdPass && 'Please follow the password policy.' }</span>
+									</FormGroup>
 								</Col>
+
+								<Col md='12'>
+									<FormGroup controlId="formControlsSelect">
+										<label>
+											<span className='star-color'>*</span>
+											Confirm Password
+										</label>
+										<Form.Control
+											type='password'
+											value={confirmPassword}
+											onChange={this.handleConfirmPasswordInputChange}
+											size="sm"
+										/>
+										<span className='error-text'>{ confirmPassword !== password && "Passwords don't match." }</span>
+									</FormGroup>
+								</Col>
+
 							</Col>
-							<Col md='6' sm='12' >
+							<Col md='1'/>
+							<Col md='5' sm='12' >
 								<PasswordPolicy 
 									password={password}
 									firstName={firstName}
@@ -316,7 +340,7 @@ class ForgetPassword extends Component {
 						</Row>
 						<Row className='padding-box'>
 							<Col xl='6' md='6'>
-								<button type="button" className="btn btn-danger btn-md" onClick={this.handlePreBtnClick} disabled={isSubmitBtnWork || afterSubmit}>
+								<button type="button" className="btn btn-danger btn-md" onClick={this.handlePreBtnClick} disabled={step1Show}>
 									Previous
 								</button>
 							</Col>
@@ -334,6 +358,7 @@ class ForgetPassword extends Component {
 	}
 
 	render() {
+		const { currentStep } = this.state
 		let message = null;
 		switch (this.state.errorMessage) {
 			case 'apiError':
@@ -353,38 +378,22 @@ class ForgetPassword extends Component {
 				</h4>
 				<hr/>
 				{message}
-				<Row className='border-box'>
-					<Col md='6'>
-						<Col md='12' className='blank-height'/>
-						<Col md='12' className='text-center'>
-								<span
-									className='dot'
-									style={this.state.step1Show ? { backgroundColor: '#00BC8C' } : {}}
-								>1</span>
-						</Col>
-						<Col md='12' className='text-center'>
-							<p className='text-padding-top'>User ID Login</p>
-						</Col>
+
+				<Row>
+					<Col md={6} sm={12}>
+						<Steps current={currentStep}>
+							<Step title="User ID Login" onClick={this.handlePreBtnClick}/>
+							<Step title="Reset Password" />
+						</Steps>
 					</Col>
-					<Col md='6'>
-						<Col md='12' className='blank-height'/>
-						<Col md='12' className='text-center'>
-								<span
-									className='dot'
-									style={this.state.step1Show ? {} : { backgroundColor: '#00BC8C' }}
-								>2</span>
-						</Col>
-						<Col md='12' className='text-center'>
-							<p className='text-padding-top'>Reset Password</p>
-						</Col>
-					</Col>
+
+					<Divider/>
 				</Row>
-				{this.state.step1Error ?
-					<Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{this.state.apiMessage}</p></Row> : null
-				}
-				<Row className='padding-box'>
-					{this.renderStep()}
-				</Row>
+					{this.state.step1Error ?
+						<Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{this.state.apiMessage}</p></Row> : null
+					}
+						{this.renderStep()}
+
 			</Container>
 		);
 	}
