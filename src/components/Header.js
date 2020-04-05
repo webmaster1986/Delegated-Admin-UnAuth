@@ -4,7 +4,7 @@ import {
   Nav,
   Navbar
 } from 'react-bootstrap';
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 
 import badge from '../components/images/FDNY.png';
 import MobileMenu from "./MobileMenu";
@@ -33,8 +33,6 @@ class Header extends Component {
   render() {
     const envMode =  this.getReactAppEnv();
     const className = envMode === 'dev' ? 'green-banner' : envMode === 'tst' ? 'blue-banner' : envMode === 'stg' ? 'purple-banner' : 'red-banner';
-    const { pathname } = this.props.location
-    const pathArray = (pathname || "").includes("password-reset") || (pathname || "").includes("claim-account")
     return (
       <div
         className={`header-nav ${className}`}
@@ -52,32 +50,6 @@ class Header extends Component {
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="mr-auto desktop-menu">
-                <ul className="nav">
-                  { pathArray ? null :
-                    <li>
-                      <Nav.Item>
-                        <Link
-                          to="/SelfService/unauth/claim-account"
-                          className={'nav-link color-white'}
-                        >
-                          Claim Account
-                        </Link>
-                      </Nav.Item>
-                    </li>
-                  }
-                  { pathArray ? null :
-                    <li>
-                      <Nav.Item>
-                        <Link
-                            to="/SelfService/unauth/password-reset"
-                            className={'nav-link color-white'}
-                        >
-                          Reset Password
-                        </Link>
-                      </Nav.Item>
-                    </li>
-                  }
-                </ul>
               </Nav>
               <MobileMenu/>
             </Navbar.Collapse>

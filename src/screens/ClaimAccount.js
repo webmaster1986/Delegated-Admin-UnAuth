@@ -514,7 +514,7 @@ class ClaimAccount extends React.Component {
                             <span className='star-color'>*</span>
                             Password
                           </label>
-                          <Col md='8' lg='6' xl='5' className='pl-0'>
+                          <Col lg='8' xl='8' className='pl-0'>
                             <Form.Control
                               type="password"
                               placeholder=""
@@ -534,7 +534,7 @@ class ClaimAccount extends React.Component {
                             <span className='star-color'>*</span>
                             Confirm Password
                           </label>
-                          <Col md='8' lg='6' xl='5' className='pl-0'>
+                          <Col lg='8' xl='8' className='pl-0'>
                             <Form.Control
                               type="password"
                               placeholder=""
@@ -566,6 +566,17 @@ class ClaimAccount extends React.Component {
           }
 
         </Row>
+
+        {
+          currentStep === 3 ?
+            <div>
+              <h5>Password</h5>
+              <div className="p-2">
+                <p>{(password && confirmPassword) ? "You have set the password." : 'You have skip the password.'}</p>
+              </div>
+            </div> : null
+        }
+
 
         { currentStep === 1 || currentStep === 3 ?
           <div >

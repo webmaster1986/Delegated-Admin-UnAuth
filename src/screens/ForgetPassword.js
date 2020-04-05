@@ -277,7 +277,7 @@ class ForgetPassword extends Component {
 									</span>
 								</h5>
 
-								<Col md='10' lg='8' xl='6' style={{marginBottom: 5}}>
+								<Col style={{marginBottom: 5}}>
 									<span>
 										{questions[questionNum]}
 										<span
