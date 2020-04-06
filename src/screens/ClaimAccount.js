@@ -114,15 +114,14 @@ class ClaimAccount extends React.Component {
   }
 
   handleSSNBlur = (e) => {
-    if (e.target.value === undefined || e.target.value.toString().length < 4) {
-      this.setState({
-        last4ofSSNError: true
-      })
+    const { error } = this.state
+    const { value, name } = e.target
+    if (value === undefined || value.toString().length < 4) {
+      error[name] = 'Enter the last 4 digits of SSN'
     } else {
-      this.setState({
-        last4ofSSNError: false
-      })
+      delete error[name]
     }
+    this.setState({error})
   }
 
   handleDateChange = (date) => {
@@ -134,16 +133,27 @@ class ClaimAccount extends React.Component {
   handleBlur = (e) => {
     let {error, userLogin} = this.state
     const {name, value} = e.target
-    error[name] = !value ? `Please provide ${name}` : ""
+
+    let errorName = ''
+    if(name === "userLogin"){
+      errorName = 'Enter the FISA reference number'
+    } else if(name === "firstName"){
+      errorName = 'Enter the first name'
+    } else if(name === "lastName"){
+      errorName = 'Enter the last name'
+    } else if(name === "dob"){
+      errorName = 'Enter the date of birth'
+    }
+    error[name] = !value ? errorName : ""
     if (name === "userLogin") {
       // if (/^[0-9]/.test(userLogin)) {
       if (userLogin && userLogin.length < 7) {
         this.setState({
           userLogin: '0'.repeat(7 - value.length) + value,
         })
-      } else if (value.length < 7) {
-        error[name] = `Please provide valid ${name}`
-      }
+      } /*else if (value.length < 7) {
+        error[name] = `Please enter a valid ${name}`
+      }*/
     }
     this.setState({ error })
   }
@@ -156,16 +166,16 @@ class ClaimAccount extends React.Component {
         message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Please enter all the required fields.</p></Row>;
         break;
       case 'duplicateAnswers':
-        message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>The Security Questions and Answers could not be set because there were duplicate answers.</p></Row>;
+        message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>The answers to Security Questions have to be unique. Please correct the duplicate answers.</p></Row>;
         break;
       case 'sameQuestion':
-        message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Security Questions should not be same.</p></Row>;
+        message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Security Questions should be unique.</p></Row>;
         break;
       case 'apiError':
         message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{apiMessage}</p></Row>;
         break;
       case 'pass':
-        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>User account has been successfully registered.<br/>Please wait at least 5 mins before attempting to login.<br/><a href='http://www.fdny.org/'>Click here </a>to go to the home page.</p></Row>;
+        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Your account has been successfully claimed.<br/><a href='http://www.fdny.org/'>Click here </a>to go to the home page.</p></Row>;
         break;
       default:
         message = null;
@@ -252,21 +262,21 @@ class ClaimAccount extends React.Component {
 
       let birthday = dob;
       const  user = {
-        userLogin, firstName, lastName,
+        userLogin: (userLogin || '').trim(), firstName: (firstName || '').trim(), lastName: (lastName || '').trim(),
         dob: `${birthday.getFullYear()}-${birthday.getMonth() <= 8 ? `0${birthday.getMonth() + 1}` : `${birthday.getMonth() + 1}`}-${birthday.getDate() < 10 ? `0${birthday.getDate()}` : `${birthday.getDate()}`}`,
         last4ofSSN, password, confirmPassword,
         challengeQuestions: [
           {
             name: challenges[0].challenge,
-            value: challenges[0].response
+            value: (challenges[0] && challenges[0].response || '').trim()
           },
           {
             name: challenges[1].challenge,
-            value: challenges[1].response
+            value: (challenges[1] && challenges[1].response || '').trim()
           },
           {
             name: challenges[2].challenge,
-            value: challenges[2].response
+            value: (challenges[2] && challenges[2].response || '').trim()
           }
         ]
       };
@@ -279,13 +289,17 @@ class ClaimAccount extends React.Component {
           afterSubmit: false
         })
       }else {
-        window.scrollTo(0, 0);
-        this.setState (this.baseState);
-        this.setState({
-          errorMessage: 'pass',
-          afterSubmit: false
+        // window.scrollTo(0, 0);
+        // this.setState (this.baseState);
+        // this.setState({
+        //   errorMessage: 'pass',
+        //   afterSubmit: false
+        // })
+        // this.props.history.push('/SelfService/unauth/success')
+        this.props.history.push({
+          pathname: '/SelfService/unauth/success',
+          state: { data: response, location: 'claimAccount' }
         })
-        this.props.history.push('/SelfService/unauth/success')
       }
     }
   }
@@ -365,7 +379,7 @@ class ClaimAccount extends React.Component {
 
   render() {
     const {errorMessage, firstName, lastName, userLogin, dob, last4ofSSN,
-      password, confirmPassword, challenges, allChallengeQuestions, afterSubmit, currentStep} = this.state;
+      password, confirmPassword, challenges, allChallengeQuestions, afterSubmit, currentStep, error} = this.state;
 
     const isPwdPassValidate = !password || password.includes(firstName) ||  password.includes(lastName) || !/(.*[a-zA-Z]){2,}/.test(password) || password.length < 8 || !/(.*[a-z]){1,}/.test(password) || !/(.*[0-9]){1,}/.test(password) ||
         !/(.*[$#@$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin)
@@ -402,7 +416,7 @@ class ClaimAccount extends React.Component {
 
                   <Form as={Row} className={isViewMode ? "" : "pb-10"} >
                     <Form.Label column md="4">
-                      <span className='star-color'>*</span>User Login
+                      {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number
                     </Form.Label>
                     <Col md='8' lg='6' xl='5'>
                       <Form.Control
@@ -414,12 +428,13 @@ class ClaimAccount extends React.Component {
                           readOnly={isViewMode}
                           plaintext={isViewMode}
                       />
+                      { error && error.userLogin ? <span className="error-text">{error.userLogin}</span> : null }
                     </Col>
                   </Form>
 
                   <Form as={Row} className={isViewMode ? "" : "pb-10"}>
                     <Form.Label column md="4">
-                      <span className='star-color'>*</span>First Name
+                      {isViewMode ? null : <span className='star-color'>*</span>}First Name
                     </Form.Label>
                     <Col md='8' lg='6' xl='5'>
                       <Form.Control
@@ -431,12 +446,13 @@ class ClaimAccount extends React.Component {
                           readOnly={isViewMode}
                           plaintext={isViewMode}
                       />
+                      { error && error.firstName ? <span className="error-text">{error.firstName}</span> : null }
                     </Col>
                   </Form>
 
                   <Form as={Row} className={isViewMode ? "" : "pb-10"}>
                     <Form.Label column md="4">
-                      <span className='star-color'>*</span>Last Name
+                      {isViewMode ? null : <span className='star-color'>*</span>}Last Name
                     </Form.Label>
                     <Col md='8' lg='6' xl='5'>
                       <Form.Control
@@ -448,12 +464,13 @@ class ClaimAccount extends React.Component {
                           readOnly={isViewMode}
                           plaintext={isViewMode}
                       />
+                      { error && error.lastName ? <span className="error-text">{error.lastName}</span> : null }
                     </Col>
                   </Form>
 
                   <Form as={Row} style={{alignItems: 'center'}} className={isViewMode ? "" : "pb-10"}>
                     <Form.Label column md="4">
-                      <span className='star-color'>*</span>Date of Birth
+                      {isViewMode ? null : <span className='star-color'>*</span>}Date of Birth
                     </Form.Label>
                     <Col md='8' lg='6' xl='5'>
                       {
@@ -466,6 +483,7 @@ class ClaimAccount extends React.Component {
                             showMonthDropdown
                             showYearDropdown
                             dropdownMode="select"
+                            name="dob"
                             onBlur={this.handleBlur}
                             maxDate={new Date()}
                             className='form-control form-control-sm'
@@ -473,12 +491,13 @@ class ClaimAccount extends React.Component {
                           /> :
                           <span style={{color: '#212529'}}>{dob && moment(dob).format("MM/DD/YYYY")}</span>
                       }
+                      { error && error.dob ? <span className="error-text">{error.dob}</span> : null }
                     </Col>
                   </Form>
 
                   <Form as={Row} className={isViewMode ? "" : "pb-10"}>
                     <Form.Label column md="4">
-                      <span className='star-color'>*</span>SSN
+                      {isViewMode ? null : <span className='star-color'>*</span>}SSN
                     </Form.Label>
                     <Col md='8' lg='6' xl='5'>
                       <Form.Control
@@ -492,6 +511,7 @@ class ClaimAccount extends React.Component {
                           plaintext={isViewMode}
                       />
                       { !isViewMode ? <p style={{fontStyle: 'italic', fontSize: '12px'}}>(last 4 digits)</p> : null }
+                      { error && error.last4ofSSN ? <span className="error-text">{error.last4ofSSN}</span> : null }
                     </Col>
                   </Form>
 
@@ -544,7 +564,7 @@ class ClaimAccount extends React.Component {
                               size="sm"
                             />
                           </Col>
-                          <span className='error-text'>{confirmPassword && confirmPassword !== password && "Passwords don't match."}</span>
+                          <span className='error-text'>{confirmPassword && confirmPassword !== password && "Passwords do not match."}</span>
                         </FormGroup>
                       </Form>
 
@@ -567,17 +587,6 @@ class ClaimAccount extends React.Component {
 
         </Row>
 
-        {
-          currentStep === 3 ?
-            <div>
-              <h5>Password</h5>
-              <div className="p-2">
-                <p>{(password && confirmPassword) ? "You have set the password." : 'You have skip the password.'}</p>
-              </div>
-            </div> : null
-        }
-
-
         { currentStep === 1 || currentStep === 3 ?
           <div >
             { !isViewMode ?  <h5>Security Questions</h5> : null }
@@ -588,7 +597,7 @@ class ClaimAccount extends React.Component {
                   <Row>
                     <Col md={6} sm={12}>
                       <div >
-                        <h5>Security Questions</h5>
+                        <h5>Set up Security Questions</h5>
                         <div className="p-2">
                           {
                             challenges && challenges.map((item, i) => {
@@ -670,6 +679,16 @@ class ClaimAccount extends React.Component {
 
             </div>
           </div> : null
+        }
+
+        {
+          currentStep === 3 ?
+            <div>
+              <h5>Set Password</h5>
+              <div className="p-2">
+                <p>{(password && confirmPassword) ? "Password updated" : 'You have chosen to skip this step'}</p>
+              </div>
+            </div> : null
         }
 
         <br/>

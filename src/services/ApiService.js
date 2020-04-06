@@ -110,7 +110,7 @@ export class ApiService {
     }
 
     async updateClaim(payload) {
-        // return {"status":"completed","userId":"NA11111"}
+        // return {"passwordError":"The following password policy rules were not met:Password must not be one of 6 previous passwords.","status":"success","userLogin":"0407143"}
         return await ApiService.postMethod(`/SelfService/webapi/unauthapi/claim`, payload);
     }
 }

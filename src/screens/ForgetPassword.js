@@ -1,4 +1,5 @@
 import React, { Fragment, Component } from 'react';
+import { withRouter } from 'react-router-dom'
 import {Container, Form, Row, Col, FormGroup} from 'react-bootstrap';
 import axios from 'axios';
 
@@ -103,7 +104,7 @@ class ForgetPassword extends Component {
 					step1Show: true,
 					currentStep: 0,
 					step1Error: true,
-					apiMessage: 'Your security questions have not been setup. Please contact the helpdesk to reset your password.'
+					apiMessage: 'The security questions have not been setup for your account. Please contact the helpdesk to reset your password.'
 				})
 			} else {
 				this.setState({
@@ -192,6 +193,10 @@ class ForgetPassword extends Component {
 			}
 		)
 			.then(function (response) {
+				self.props.history.push({
+					pathname: '/SelfService/unauth/success',
+					state: { data: { location: 'forgetPassword' } }
+				})
 				self.setState({
 					errorMessage: 'pass',
 					isLoaderShow: false,
@@ -405,4 +410,4 @@ class ForgetPassword extends Component {
 	}
 }
 
-export default ForgetPassword;
+export default withRouter(ForgetPassword);
