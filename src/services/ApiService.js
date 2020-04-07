@@ -4,35 +4,35 @@ const axiosInstance = axios.create({
     baseURL: apiEndPoint,
 });
 
-// const data = {
-//     "challengeQuestions": [
-//         "What is your mother's maiden name?",
-//         "What is your favorite color?",
-//         "What is the name of your pet?",
-//         "What is the city of your birth?",
-//         "What highschool did you attend?",
-//         "In what city did you meet your spouse/significant other?",
-//         "What was your childhood nickname?",
-//         "What street did you live on in third grade?",
-//         "What is the name of your favorite childhood friend?",
-//         "What is your oldest sibling's birth month and year?",
-//         "What is the middle name of your oldest child?",
-//         "What is your oldest sibling's middle name?"
-//     ]
-// }
+/* const data = {
+     "challengeQuestions": [
+         "What is your mother's maiden name?",
+         "What is your favorite color?",
+         "What is the name of your pet?",
+         "What is the city of your birth?",
+         "What highschool did you attend?",
+         "In what city did you meet your spouse/significant other?",
+         "What was your childhood nickname?",
+         "What street did you live on in third grade?",
+         "What is the name of your favorite childhood friend?",
+         "What is your oldest sibling's birth month and year?",
+         "What is the middle name of your oldest child?",
+         "What is your oldest sibling's middle name?"
+     ]
+ }
 
-// const userInfo = {
-//     "challengeQuestions": [
-//         "Who was your fifth grade teacher?",
-//         "What street did you live on in third grade?",
-//         "What is your oldest sibling's birth month and year?"
-//     ],
-//     "email": "Deepa.George@fdny.nyc.gov",
-//     "firstName": "DEEPA",
-//     "lastName": "GEORGE",
-//     "userId": "11111",
-//     "userLogin": "N1111111"
-// }
+ const userInfo = {
+     "challengeQuestions": [
+         "Who was your fifth grade teacher?",
+         "What street did you live on in third grade?",
+         "What is your oldest sibling's birth month and year?"
+     ],
+     "email": "Deepa.George@fdny.nyc.gov",
+     "firstName": "DEEPA",
+     "lastName": "GEORGE",
+     "userId": "11111",
+     "userLogin": "N1111111"
+ }*/
 
 export class ApiService {
 

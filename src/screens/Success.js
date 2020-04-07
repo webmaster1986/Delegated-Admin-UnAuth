@@ -9,8 +9,8 @@ class Success extends React.Component {
                 {
                     state.location === 'claimAccount' ?
                         <>
-                            <h5 className="text-left">Your data saved successfully.</h5>
-                            { (state.data && state.data.passwordError) ? <div style={{padding: '0 10px'}}>{state.data.passwordError}</div> : null }
+                            <h5 className="text-left">Your account has been successfully claimed.</h5>
+                            { (state.data && state.data.passwordError) ? <div style={{padding: '0 10px'}}>The password could not be updated because of an error. Please use the <a href='/SelfService/unauth/password-reset'>Reset Password </a> page to reset your password.</div> : null }
                         </> :
                         <>
                             { (state.data && state.data.location === 'forgetPassword') ? <h6>Your password has been reset successfully. <a href='http://www.fdny.org/'>Click here </a>to go to home page.</h6> : null }
