@@ -66,11 +66,7 @@ export class ApiService {
         }
         let resData = '';
         const response = await axiosInstance.post(url, data, config).catch(thrown => {
-            if (thrown.toString() === 'Cancel') {
-                resData = 'cancel';
-            } else {
-                resData = {error: (thrown && thrown.response && thrown.response.data && thrown.response.data.message) || 'An error has occurred'};;
-            }
+            resData = {error: 'An error has occurred.' , errorData: thrown};
         });
         return resData || response.data;
     }
@@ -118,5 +114,10 @@ export class ApiService {
     async updateClaim(payload) {
         // return {"passwordError":"The following password policy rules were not met:Password must not be one of 6 previous passwords.","status":"success","userLogin":"0407143"}
         return await ApiService.postMethod(`/SelfService/webapi/unauthapi/claim`, payload);
+    }
+
+    async getBasicInfo(payload) {
+        // return {"passwordError":"The following password policy rules were not met:Password must not be one of 6 previous passwords.","status":"success","userLogin":"0407143"}
+        return await ApiService.postMethod(`/selfService/webapi/unauthapi/searches/users`, payload);
     }
 }

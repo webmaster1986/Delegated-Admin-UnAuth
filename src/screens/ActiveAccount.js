@@ -179,6 +179,9 @@ class ActiveAccount extends React.Component {
       case 'pass':
         message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Your account has been successfully Actived.<br/><a href='http://www.fdny.org/'>Click here </a>to go to the home page.</p></Row>;
         break;
+      case 'isResponseError':
+        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{this.state.responseErrMsg}</p></Row>;
+        break;
       default:
         message = null;
     }
@@ -306,7 +309,7 @@ class ActiveAccount extends React.Component {
     }
   }
 
-  onValidationCheck = () => {
+  onValidationCheck = async () => {
     const {userLogin, firstName, lastName, last4ofSSN, dob, password, confirmPassword, challenges, currentStep} = this.state;
     this.setState({
       afterSubmit: true
@@ -357,10 +360,34 @@ class ActiveAccount extends React.Component {
         afterSubmit: false
       })
     } else {
+      let errorMessage = ""
+      let responseErrMsg = ""
+      const object = {}
+      if(currentStep === 0) {
+        const payload = {
+          userLogin: (userLogin || '').trim(),
+          firstName: (firstName || '').trim(),
+          lastName: (lastName || '').trim(),
+          dob,
+          last4ofSSN
+        }
+        const response = await this._apiService.getBasicInfo(payload);
+        if (!response || response.error) {
+          if (response && response.errorData && response.errorData.response && response.errorData.response.data && response.errorData.response.data.message) {
+            errorMessage = 'isResponseError'
+            responseErrMsg = response.errorData.response.data.message
+          }
+        } else {
+          object.currentStep = currentStep + 1
+        }
+      } else {
+        object.currentStep = currentStep + 1
+      }
       this.setState({
-        errorMessage: '',
+        errorMessage,
+        responseErrMsg,
         afterSubmit: false,
-        currentStep: currentStep + 1
+        ...object
       })
     }
   }
