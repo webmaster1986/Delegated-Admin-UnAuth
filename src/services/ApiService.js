@@ -95,6 +95,12 @@ export class ApiService {
         return resData || response.data;
     }
 
+    async getEnvironment() {
+        return { "environment": "dev" }
+        // return await ApiService.getData(`environment.json`);
+        // return await ApiService.getData(`v1/environments`);
+    }
+
     async getUserInformation(userName) {
         // return userInfo
         // return await ApiService.getData(`GetUserInfo.json`);

@@ -507,3 +507,23 @@ input[type=number] {
 .pl-0 {
   padding-left: 0;
 }
+
+.fs-8 {
+  font-size: 8px;
+}
+
+.info-icon {
+  padding-left: 5px;
+  color: orange !important;
+}
+
+.security-question {
+  color: #212529;
+  font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+  .hide-img {
+    display: none;
+  }
+}

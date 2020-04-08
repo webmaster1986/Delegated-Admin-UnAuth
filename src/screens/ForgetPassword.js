@@ -305,6 +305,10 @@ class ForgetPassword extends Component {
 									</FormGroup>
 								</Col>
 
+								<h5 className="pl-0 pb-0">
+									Set your password
+								</h5>
+
 								<Col md='10' lg='8' xl='6'>
 									<FormGroup controlId="formControlsSelect">
 										<label>

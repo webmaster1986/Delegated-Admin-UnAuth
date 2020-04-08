@@ -11,28 +11,10 @@ import MobileMenu from "./MobileMenu";
 import "./nav.css"
 
 class Header extends Component {
-  getReactAppEnv  = () => {
-    const host = window.location.host;
-    let env = "";
-    if (host.includes("dev")) {
-      console.log ("dev");
-      env = "dev";
-    } else if (host.includes("tst")) {
-      console.log ("tst");
-      env = "tst";
-    } else if (host.includes("stg")) {
-      console.log ("stg");
-      env = "stg";
-    } else {
-      console.log ("prod");
-      env = "prod";
-    }
-    return env
-  };
 
   render() {
-    const envMode =  this.getReactAppEnv();
-    const className = envMode === 'dev' ? 'green-banner' : envMode === 'tst' ? 'blue-banner' : envMode === 'stg' ? 'purple-banner' : 'red-banner';
+    const { environment } = this.props
+    const className = environment === 'dev' ? 'green-banner' : environment === 'tst' ? 'blue-banner' : environment === 'stg' ? 'purple-banner' : 'red-banner';
     return (
       <div
         className={`header-nav ${className}`}
