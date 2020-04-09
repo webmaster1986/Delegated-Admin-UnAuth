@@ -10,7 +10,7 @@ import check from "../components/images/check.jpg";
 
 const { Step } = Steps
 
-class ActiveAccount extends React.Component {
+class ActivateAccount extends React.Component {
   _apiService = new ApiService();
 
   constructor(props) {
@@ -59,7 +59,7 @@ class ActiveAccount extends React.Component {
   }
 
   async componentDidMount() {
-    document.title = "Active Account";
+    document.title = "Activate Account";
     this.setState({
       isLoaderShow: true
     })
@@ -177,7 +177,7 @@ class ActiveAccount extends React.Component {
         message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{apiMessage}</p></Row>;
         break;
       case 'pass':
-        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Your account has been successfully Actived.<br/><a href='http://www.fdny.org/'>Click here </a>to go to the home page.</p></Row>;
+        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Your account has been successfully Activated.<br/><a href='http://www.fdny.org/'>Click here </a>to go to the home page.</p></Row>;
         break;
       case 'isResponseError':
         message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{this.state.responseErrMsg}</p></Row>;
@@ -303,7 +303,7 @@ class ActiveAccount extends React.Component {
         // this.props.history.push('/SelfService/unauth/success')
         this.props.history.push({
           pathname: '/SelfService/unauth/success',
-          state: { data: response, location: 'activeAccount' }
+          state: { data: response, location: 'activateAccount' }
         })
       }
     }
@@ -422,7 +422,7 @@ class ActiveAccount extends React.Component {
 
     return (
       <Container className='container-design'>
-        <h4>Active Account</h4>
+        <h4>Activate Account</h4>
         <hr/>
         {message}
         <Row>
@@ -787,4 +787,4 @@ class ActiveAccount extends React.Component {
   }
 }
 
-export default ActiveAccount;
+export default ActivateAccount;

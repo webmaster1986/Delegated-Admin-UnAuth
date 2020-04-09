@@ -3,7 +3,7 @@ import {Route, Switch} from 'react-router-dom'
 import {Container} from 'react-bootstrap';
 import {Spin} from 'antd';
 
-import ActiveAccount from "./screens/ActiveAccount";
+import ActivateAccount from "./screens/ActivateAccount";
 import ForgetPassword from "./screens/ForgetPassword";
 import Success from "./screens/Success";
 import AccountLocked from "./screens/AccountLocked";
@@ -45,7 +45,7 @@ class App extends Component {
                         <Container>
                             <Switch>
                                 <React.Fragment>
-                                    <Route path='/SelfService/unauth/active-account' component={ActiveAccount}/>
+                                    <Route path='/SelfService/unauth/activate-account' component={ActivateAccount}/>
                                     <Route path='/SelfService/unauth/password-reset' component={ForgetPassword} />
                                     <Route path='/SelfService/unauth/success' component={Success}/>
                                     <Route path='/SelfService/unauth/accountlocked' component={AccountLocked} />

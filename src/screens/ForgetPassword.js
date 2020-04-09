@@ -6,7 +6,7 @@ import axios from 'axios';
 import check from '../components/images/check.jpg';
 import PasswordPolicy from '../components/PasswordPolicy';
 
-import 'react-block-ui/style.css';
+// import 'react-block-ui/style.css';
 import {ApiService} from "../services/ApiService";
 import {Divider, Steps} from "antd";
 
