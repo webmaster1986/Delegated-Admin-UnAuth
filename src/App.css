@@ -401,7 +401,6 @@ label {
   /*font-weight: bold;*/
   font-size: 13px !important;
   white-space: nowrap;
-  text-transform: uppercase;
   margin-bottom: 0 !important;
 }
 
@@ -514,7 +513,8 @@ input[type=number] {
 
 .info-icon {
   padding-left: 5px;
-  color: orange !important;
+  color: #1890ff !important;
+  font-size: 18px;
 }
 
 .security-question {

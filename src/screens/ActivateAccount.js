@@ -735,10 +735,8 @@ class ActivateAccount extends React.Component {
               <h5>Set Password</h5>
               <div className="p-2">
                 <p>
-                  {(password && confirmPassword) ? "Password updated" : 'You have chosen to skip this step'}
-                  <Tooltip title="Password hidden for security reason">
-                    <Icon type="info-circle" className="info-icon"/>
-                  </Tooltip>
+                  <Icon type="info-circle" className="info-icon"/>
+                  <span className="ml-2">Password is hidden for security reason</span>
                 </p>
               </div>
             </div> : null
