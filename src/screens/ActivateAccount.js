@@ -411,7 +411,7 @@ class ActivateAccount extends React.Component {
       password, confirmPassword, challenges, allChallengeQuestions, afterSubmit, currentStep, error, isCheckShow} = this.state;
 
     const isPwdPassValidate = !password || password.includes(firstName) ||  password.includes(lastName) || !/(.*[a-zA-Z]){2,}/.test(password) || password.length < 8 || !/(.*[a-z]){1,}/.test(password) || !/(.*[0-9]){1,}/.test(password) ||
-        !/(.*[$#@$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin)
+        !/(.*[$#@^$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin)
 
     let message = null;
     if (errorMessage && Object.keys(errorMessage).length) {
@@ -448,7 +448,7 @@ class ActivateAccount extends React.Component {
                       <Form.Label column md='5' lg='4' xl='4'>
                         {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number
                         {isViewMode ? null :
-                          <div className="text-danger font-italic cursor-pointer fs-8">
+                          <div className="text-danger font-italic cursor-pointer fs-10">
                             <span onClick={() => this.setState({isCheckShow: !isCheckShow})}>
                               (Need help to find your ID Number?)
                             </span>

@@ -222,7 +222,7 @@ class ForgetPassword extends Component {
 			userName, password, questions, answer, answerError, confirmPassword} = this.state;
 
 		let isNextBtnWork = userName.length < 7 || userName === undefined;
-		let isPwdPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])[A-Za-z\d$@#$!%*?&]{8,}/.test(password) &&
+		let isPwdPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@^$!%*?&])[A-Za-z\d$@^#$!%*?&]{8,}/.test(password) &&
 			!password.includes(userName) &&
 			/[A-Za-z]/.test(password.substring(0, 1));
 
