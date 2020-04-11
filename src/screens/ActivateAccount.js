@@ -217,95 +217,39 @@ class ActivateAccount extends React.Component {
       afterSubmit: true
     })
 
-    let isRequiredEmpty = (userLogin === undefined || userLogin.length < 7) ||
-      (firstName === undefined || firstName.length === 0) ||
-      (lastName === undefined || lastName.length === 0) ||
-      (dob === undefined || dob.length === 0) ||
-      (last4ofSSN === undefined || last4ofSSN.toString().length < 4) ||
-      (password || confirmPassword) && ((password === undefined || password.length === 0) ||
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])[A-Za-z\d$@#$!%*?&]{8,}/.test(password) ||
-      password.includes(firstName) ||
-      password.includes(lastName) ||
-      password.includes(userLogin) ||
-      !/[A-Za-z]/.test(password.substring(0, 1)) ||
-      (confirmPassword === undefined || confirmPassword.length === 0 || confirmPassword !== password)) ||
-      (challenges[0].response === undefined || challenges[0].response.length === 0) ||
-      (challenges[1].response === undefined || challenges[1].response.length === 0) ||
-      (challenges[2].response === undefined || challenges[2].response.length === 0);
-
-    let isQuestionSame = challenges[0].challenge === challenges[1].challenge ||
-      challenges[0].challenge === challenges[2].challenge ||
-      challenges[1].challenge === challenges[2].challenge;
-
-    let isAnswerSame = challenges[0].response === challenges[1].response ||
-      challenges[0].response === challenges[2].response ||
-      challenges[1].response === challenges[2].response;
-
-    if (isRequiredEmpty) {
+    let birthday = dob;
+    const  user = {
+      userLogin: (userLogin || '').trim(), firstName: (firstName || '').trim(), lastName: (lastName || '').trim(),
+      dob: `${birthday.getFullYear()}-${birthday.getMonth() <= 8 ? `0${birthday.getMonth() + 1}` : `${birthday.getMonth() + 1}`}-${birthday.getDate() < 10 ? `0${birthday.getDate()}` : `${birthday.getDate()}`}`,
+      last4ofSSN, password, confirmPassword,
+      challengeQuestions: [
+        {
+          name: challenges[0].challenge,
+          value: (challenges[0] && challenges[0].response || '').trim()
+        },
+        {
+          name: challenges[1].challenge,
+          value: (challenges[1] && challenges[1].response || '').trim()
+        },
+        {
+          name: challenges[2].challenge,
+          value: (challenges[2] && challenges[2].response || '').trim()
+        }
+      ]
+    };
+    const response = await this._apiService.updateClaim(user);
+    if (!response || response.error) {
       window.scrollTo(0, 0);
       this.setState({
-        errorMessage: 'noRequiredFields',
-        afterSubmit: false
-      })
-    } else if (isQuestionSame) {
-      window.scrollTo(0, 0);
-      this.setState({
-        errorMessage: 'sameQuestion',
-        afterSubmit: false
-      })
-    }
-    else if (isAnswerSame) {
-      window.scrollTo(0, 0);
-      this.setState({
-        errorMessage: 'duplicateAnswers',
+        apiMessage: response.error || 'An error has occurred',
+        errorMessage: 'apiError',
         afterSubmit: false
       })
     } else {
-      this.setState({
-        errorMessage: '',
+      this.props.history.push({
+        pathname: '/SelfService/unauth/success',
+        state: { data: response, location: 'activateAccount' }
       })
-
-      let birthday = dob;
-      const  user = {
-        userLogin: (userLogin || '').trim(), firstName: (firstName || '').trim(), lastName: (lastName || '').trim(),
-        dob: `${birthday.getFullYear()}-${birthday.getMonth() <= 8 ? `0${birthday.getMonth() + 1}` : `${birthday.getMonth() + 1}`}-${birthday.getDate() < 10 ? `0${birthday.getDate()}` : `${birthday.getDate()}`}`,
-        last4ofSSN, password, confirmPassword,
-        challengeQuestions: [
-          {
-            name: challenges[0].challenge,
-            value: (challenges[0] && challenges[0].response || '').trim()
-          },
-          {
-            name: challenges[1].challenge,
-            value: (challenges[1] && challenges[1].response || '').trim()
-          },
-          {
-            name: challenges[2].challenge,
-            value: (challenges[2] && challenges[2].response || '').trim()
-          }
-        ]
-      };
-      const response = await this._apiService.updateClaim(user);
-      if (!response || response.error) {
-        window.scrollTo(0, 0);
-        this.setState({
-          apiMessage: response.error || 'An error has occurred',
-          errorMessage: 'apiError',
-          afterSubmit: false
-        })
-      }else {
-        // window.scrollTo(0, 0);
-        // this.setState (this.baseState);
-        // this.setState({
-        //   errorMessage: 'pass',
-        //   afterSubmit: false
-        // })
-        // this.props.history.push('/SelfService/unauth/success')
-        this.props.history.push({
-          pathname: '/SelfService/unauth/success',
-          state: { data: response, location: 'activateAccount' }
-        })
-      }
     }
   }
 
@@ -329,7 +273,7 @@ class ActivateAccount extends React.Component {
           (challenges[2].response === undefined || challenges[2].response.length === 0);
     } else if(currentStep === 2) {
       isRequiredEmpty = (password || confirmPassword) && ((password.length === 0) ||
-          !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])[A-Za-z\d$@#$!%*?&]{8,}/.test(password) || password.includes(firstName) ||
+          !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@^$!%*?&])[A-Za-z\d$@^#$!%*?&]{8,}/.test(password) || password.includes(firstName) ||
           password.includes(lastName) || password.includes(userLogin) || !/[A-Za-z]/.test(password.substring(0, 1)) || (confirmPassword.length === 0 || confirmPassword !== password))
     }
 
