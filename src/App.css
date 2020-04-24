@@ -527,3 +527,7 @@ input[type=number] {
     display: none;
   }
 }
+
+.ws-normal {
+  white-space: normal;
+}

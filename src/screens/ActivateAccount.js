@@ -150,9 +150,12 @@ class ActivateAccount extends React.Component {
     if (name === "userLogin") {
       // if (/^[0-9]/.test(userLogin)) {
       if (userLogin && userLogin.length < 7) {
-        this.setState({
-          userLogin: '0'.repeat(7 - value.length) + value,
-        })
+        const isValue = value.toLowerCase().includes("n")
+        if(!isValue) {
+          this.setState({
+            userLogin: '0'.repeat(7 - value.length) + value,
+          })
+        }
       } /*else if (value.length < 7) {
         error[name] = `Please enter a valid ${name}`
       }*/
@@ -262,7 +265,7 @@ class ActivateAccount extends React.Component {
     let isRequiredEmpty = false
 
     if(currentStep === 0) {
-      isRequiredEmpty = (userLogin === undefined || userLogin.length < 7) ||
+      isRequiredEmpty = !userLogin ||
           (firstName === undefined || firstName.length === 0) ||
           (lastName === undefined || lastName.length === 0) ||
           (dob === undefined || dob.length === 0) ||
@@ -389,8 +392,8 @@ class ActivateAccount extends React.Component {
                   <div className="p-2">
 
                     <Form as={Row} className={isViewMode ? "" : "pb-10"} >
-                      <Form.Label column md='5' lg='4' xl='4'>
-                        {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number
+                      <Form.Label column md='5' lg='4' xl='4' className="ws-normal">
+                        {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number/Internal Employee ID
                         {isViewMode ? null :
                           <div className="text-danger font-italic cursor-pointer fs-10">
                             <span onClick={() => this.setState({isCheckShow: !isCheckShow})}>
