@@ -1,16 +1,15 @@
 import React from "react";
 import {Col, Container, Row, Form, FormGroup  } from "react-bootstrap";
-import {Steps, Divider, Tooltip, Icon} from "antd";
+import {Steps, Divider, Tooltip} from "antd";
 import DatePicker from "react-datepicker";
 import moment from "moment"
 import PasswordPolicy from "../components/PasswordPolicy";
 import "react-datepicker/dist/react-datepicker.css";
 import {ApiService} from "../services/ApiService";
-import check from "../components/images/check.jpg";
 
 const { Step } = Steps
 
-class ActivateAccount extends React.Component {
+class ClaimAccount extends React.Component {
   _apiService = new ApiService();
 
   constructor(props) {
@@ -51,7 +50,6 @@ class ActivateAccount extends React.Component {
       errorMessage: '',
       apiMessage: '',
       afterSubmit: false,
-      isCheckShow: false,
       currentStep: 0
     };
     this.baseState = this.state;
@@ -59,7 +57,7 @@ class ActivateAccount extends React.Component {
   }
 
   async componentDidMount() {
-    document.title = "Activate Account";
+    document.title = "Claim Account";
     this.setState({
       isLoaderShow: true
     })
@@ -177,10 +175,7 @@ class ActivateAccount extends React.Component {
         message = <Row className='error-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{apiMessage}</p></Row>;
         break;
       case 'pass':
-        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Your account has been successfully Activated.<br/><a href='http://www.fdny.org/'>Click here </a>to go to the home page.</p></Row>;
-        break;
-      case 'isResponseError':
-        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>{this.state.responseErrMsg}</p></Row>;
+        message = <Row className='pass-banner' style={{ paddingLeft: '20px' }}><p style={{ paddingTop: '10px' }}>Your account has been successfully claimed.<br/><a href='http://www.fdny.org/'>Click here </a>to go to the home page.</p></Row>;
         break;
       default:
         message = null;
@@ -217,43 +212,99 @@ class ActivateAccount extends React.Component {
       afterSubmit: true
     })
 
-    let birthday = dob;
-    const  user = {
-      userLogin: (userLogin || '').trim(), firstName: (firstName || '').trim(), lastName: (lastName || '').trim(),
-      dob: `${birthday.getFullYear()}-${birthday.getMonth() <= 8 ? `0${birthday.getMonth() + 1}` : `${birthday.getMonth() + 1}`}-${birthday.getDate() < 10 ? `0${birthday.getDate()}` : `${birthday.getDate()}`}`,
-      last4ofSSN, password, confirmPassword,
-      challengeQuestions: [
-        {
-          name: challenges[0].challenge,
-          value: (challenges[0] && challenges[0].response || '').trim()
-        },
-        {
-          name: challenges[1].challenge,
-          value: (challenges[1] && challenges[1].response || '').trim()
-        },
-        {
-          name: challenges[2].challenge,
-          value: (challenges[2] && challenges[2].response || '').trim()
-        }
-      ]
-    };
-    const response = await this._apiService.updateClaim(user);
-    if (!response || response.error) {
+    let isRequiredEmpty = (userLogin === undefined || userLogin.length < 7) ||
+      (firstName === undefined || firstName.length === 0) ||
+      (lastName === undefined || lastName.length === 0) ||
+      (dob === undefined || dob.length === 0) ||
+      (last4ofSSN === undefined || last4ofSSN.toString().length < 4) ||
+      (password || confirmPassword) && ((password === undefined || password.length === 0) ||
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])[A-Za-z\d$@#$!%*?&]{8,}/.test(password) ||
+      password.includes(firstName) ||
+      password.includes(lastName) ||
+      password.includes(userLogin) ||
+      !/[A-Za-z]/.test(password.substring(0, 1)) ||
+      (confirmPassword === undefined || confirmPassword.length === 0 || confirmPassword !== password)) ||
+      (challenges[0].response === undefined || challenges[0].response.length === 0) ||
+      (challenges[1].response === undefined || challenges[1].response.length === 0) ||
+      (challenges[2].response === undefined || challenges[2].response.length === 0);
+
+    let isQuestionSame = challenges[0].challenge === challenges[1].challenge ||
+      challenges[0].challenge === challenges[2].challenge ||
+      challenges[1].challenge === challenges[2].challenge;
+
+    let isAnswerSame = challenges[0].response === challenges[1].response ||
+      challenges[0].response === challenges[2].response ||
+      challenges[1].response === challenges[2].response;
+
+    if (isRequiredEmpty) {
       window.scrollTo(0, 0);
       this.setState({
-        apiMessage: response.error || 'An error has occurred',
-        errorMessage: 'apiError',
+        errorMessage: 'noRequiredFields',
+        afterSubmit: false
+      })
+    } else if (isQuestionSame) {
+      window.scrollTo(0, 0);
+      this.setState({
+        errorMessage: 'sameQuestion',
+        afterSubmit: false
+      })
+    }
+    else if (isAnswerSame) {
+      window.scrollTo(0, 0);
+      this.setState({
+        errorMessage: 'duplicateAnswers',
         afterSubmit: false
       })
     } else {
-      this.props.history.push({
-        pathname: '/SelfService/unauth/success',
-        state: { data: response, location: 'activateAccount' }
+      this.setState({
+        errorMessage: '',
       })
+
+      let birthday = dob;
+      const  user = {
+        userLogin: (userLogin || '').trim(), firstName: (firstName || '').trim(), lastName: (lastName || '').trim(),
+        dob: `${birthday.getFullYear()}-${birthday.getMonth() <= 8 ? `0${birthday.getMonth() + 1}` : `${birthday.getMonth() + 1}`}-${birthday.getDate() < 10 ? `0${birthday.getDate()}` : `${birthday.getDate()}`}`,
+        last4ofSSN, password, confirmPassword,
+        challengeQuestions: [
+          {
+            name: challenges[0].challenge,
+            value: (challenges[0] && challenges[0].response || '').trim()
+          },
+          {
+            name: challenges[1].challenge,
+            value: (challenges[1] && challenges[1].response || '').trim()
+          },
+          {
+            name: challenges[2].challenge,
+            value: (challenges[2] && challenges[2].response || '').trim()
+          }
+        ]
+      };
+      const response = await this._apiService.updateClaim(user);
+      if (!response || response.error) {
+        window.scrollTo(0, 0);
+        this.setState({
+          apiMessage: response.error || 'An error has occurred',
+          errorMessage: 'apiError',
+          afterSubmit: false
+        })
+      }else {
+        // window.scrollTo(0, 0);
+        // this.setState (this.baseState);
+        // this.setState({
+        //   errorMessage: 'pass',
+        //   afterSubmit: false
+        // })
+        // this.props.history.push('/SelfService/unauth/success')
+        this.props.history.push({
+          pathname: '/SelfService/unauth/success',
+          state: { data: response, location: 'claimAccount' }
+        })
+      }
     }
   }
 
-  onValidationCheck = async () => {
+  onValidationCheck = () => {
     const {userLogin, firstName, lastName, last4ofSSN, dob, password, confirmPassword, challenges, currentStep} = this.state;
     this.setState({
       afterSubmit: true
@@ -273,7 +324,7 @@ class ActivateAccount extends React.Component {
           (challenges[2].response === undefined || challenges[2].response.length === 0);
     } else if(currentStep === 2) {
       isRequiredEmpty = (password || confirmPassword) && ((password.length === 0) ||
-          !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@^$!%*?&])[A-Za-z\d$@^#$!%*?&]{8,}/.test(password) || password.includes(firstName) ||
+          !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])[A-Za-z\d$@#$!%*?&]{8,}/.test(password) || password.includes(firstName) ||
           password.includes(lastName) || password.includes(userLogin) || !/[A-Za-z]/.test(password.substring(0, 1)) || (confirmPassword.length === 0 || confirmPassword !== password))
     }
 
@@ -304,34 +355,10 @@ class ActivateAccount extends React.Component {
         afterSubmit: false
       })
     } else {
-      let errorMessage = ""
-      let responseErrMsg = ""
-      const object = {}
-      if(currentStep === 0) {
-        const payload = {
-          userLogin: (userLogin || '').trim(),
-          firstName: (firstName || '').trim(),
-          lastName: (lastName || '').trim(),
-          dob,
-          last4ofSSN
-        }
-        const response = await this._apiService.getBasicInfo(payload);
-        if (!response || response.error) {
-          if (response && response.errorData && response.errorData.response && response.errorData.response.data && response.errorData.response.data.message) {
-            errorMessage = 'isResponseError'
-            responseErrMsg = response.errorData.response.data.message
-          }
-        } else {
-          object.currentStep = currentStep + 1
-        }
-      } else {
-        object.currentStep = currentStep + 1
-      }
       this.setState({
-        errorMessage,
-        responseErrMsg,
+        errorMessage: '',
         afterSubmit: false,
-        ...object
+        currentStep: currentStep + 1
       })
     }
   }
@@ -352,10 +379,10 @@ class ActivateAccount extends React.Component {
 
   render() {
     const {errorMessage, firstName, lastName, userLogin, dob, last4ofSSN,
-      password, confirmPassword, challenges, allChallengeQuestions, afterSubmit, currentStep, error, isCheckShow} = this.state;
+      password, confirmPassword, challenges, allChallengeQuestions, afterSubmit, currentStep, error} = this.state;
 
     const isPwdPassValidate = !password || password.includes(firstName) ||  password.includes(lastName) || !/(.*[a-zA-Z]){2,}/.test(password) || password.length < 8 || !/(.*[a-z]){1,}/.test(password) || !/(.*[0-9]){1,}/.test(password) ||
-        !/(.*[$#@^$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin) || password.includes("@")
+        !/(.*[$#@$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin)
 
     let message = null;
     if (errorMessage && Object.keys(errorMessage).length) {
@@ -366,7 +393,7 @@ class ActivateAccount extends React.Component {
 
     return (
       <Container className='container-design'>
-        <h4>Activate Account</h4>
+        <h4>Claim Account</h4>
         <hr/>
         {message}
         <Row>
@@ -382,134 +409,115 @@ class ActivateAccount extends React.Component {
           <Divider/>
 
           { (currentStep === 0 || currentStep === 3) ?
-            <>
-              <Col md={6} sm={12}>
-                <div >
-                  <h5>Basic Information</h5>
-                  <div className="p-2">
-
-                    <Form as={Row} className={isViewMode ? "" : "pb-10"} >
-                      <Form.Label column md='5' lg='4' xl='4'>
-                        {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number
-                        {isViewMode ? null :
-                          <div className="text-danger font-italic cursor-pointer fs-10">
-                            <span onClick={() => this.setState({isCheckShow: !isCheckShow})}>
-                              (Need help to find your ID Number?)
-                            </span>
-                          </div>
-                        }
-                      </Form.Label>
-                      <Col className="hide-img">
-                        <div className={isCheckShow ? "p-2" : ""}>
-                          {isCheckShow && <img src={check} alt='Here is a check'/>}
-                        </div>
-                      </Col>
-                      <Col md='7' lg='6' xl='5'>
-                        <Form.Control
-                            value={userLogin}
-                            name="userLogin"
-                            onChange={this.handleChange}
-                            onBlur={this.handleBlur}
-                            size="sm"
-                            readOnly={isViewMode}
-                            plaintext={isViewMode}
-                        />
-                        { error && error.userLogin ? <span className="error-text">{error.userLogin}</span> : null }
-                      </Col>
-                    </Form>
-
-                    <Form as={Row} className={isViewMode ? "" : "pb-10"}>
-                      <Form.Label column md='5' lg='4' xl='4'>
-                        {isViewMode ? null : <span className='star-color'>*</span>}First Name
-                      </Form.Label>
-                      <Col md='7' lg='6' xl='5'>
-                        <Form.Control
-                            value={firstName}
-                            name="firstName"
-                            onChange={this.handleChange}
-                            onBlur={this.handleBlur}
-                            size="sm"
-                            readOnly={isViewMode}
-                            plaintext={isViewMode}
-                        />
-                        { error && error.firstName ? <span className="error-text">{error.firstName}</span> : null }
-                      </Col>
-                    </Form>
-
-                    <Form as={Row} className={isViewMode ? "" : "pb-10"}>
-                      <Form.Label column md='5' lg='4' xl='4'>
-                        {isViewMode ? null : <span className='star-color'>*</span>}Last Name
-                      </Form.Label>
-                      <Col md='7' lg='6' xl='5'>
-                        <Form.Control
-                            value={lastName}
-                            name="lastName"
-                            onChange={this.handleChange}
-                            onBlur={this.handleBlur}
-                            size="sm"
-                            readOnly={isViewMode}
-                            plaintext={isViewMode}
-                        />
-                        { error && error.lastName ? <span className="error-text">{error.lastName}</span> : null }
-                      </Col>
-                    </Form>
-
-                    <Form as={Row} style={{alignItems: 'center'}} className={isViewMode ? "" : "pb-10"}>
-                      <Form.Label column md='5' lg='4' xl='4'>
-                        {isViewMode ? null : <span className='star-color'>*</span>}Date of Birth
-                      </Form.Label>
-                      <Col md='7' lg='6' xl='5'>
-                        {
-                          !isViewMode ?
-                            <DatePicker
-                              placeholderText="MM/DD/YYYY"
-                              selected={dob}
-                              onChange={this.handleDateChange}
-                              peekNextMonth
-                              showMonthDropdown
-                              showYearDropdown
-                              dropdownMode="select"
-                              name="dob"
-                              onBlur={this.handleBlur}
-                              maxDate={new Date()}
-                              className='form-control form-control-sm'
-                              size="sm"
-                            /> :
-                            <span style={{color: '#212529'}}>{dob && moment(dob).format("MM/DD/YYYY")}</span>
-                        }
-                        { error && error.dob ? <span className="error-text">{error.dob}</span> : null }
-                      </Col>
-                    </Form>
-
-                    <Form as={Row} className={isViewMode ? "" : "pb-10"}>
-                      <Form.Label column md='5' lg='4' xl='4'>
-                        {isViewMode ? null : <span className='star-color'>*</span>}SSN
-                      </Form.Label>
-                      <Col md='7' lg='6' xl='5'>
-                        <Form.Control
-                            value={last4ofSSN}
-                            name="last4ofSSN"
-                            onChange={this.handleSSNInputChange}
-                            onBlur={this.handleSSNBlur}
-                            size="sm"
-                            readOnly={isViewMode}
-                            plaintext={isViewMode}
-                        />
-                        { !isViewMode ? <p style={{fontStyle: 'italic', fontSize: '12px'}}>(last 4 digits)</p> : null }
-                        { error && error.last4ofSSN ? <span className="error-text">{error.last4ofSSN}</span> : null }
-                      </Col>
-                    </Form>
-
-                  </div>
-                </div>
-              </Col>
-              <Col className="d-none d-md-block">
-                <h5>&nbsp;</h5>
+            <Col md={6} sm={12}>
+              <div >
+                <h5>Basic Information</h5>
                 <div className="p-2">
-                  {isCheckShow && <img src={check} alt='Here is a check'/>}
+
+                  <Form as={Row} className={isViewMode ? "" : "pb-10"} >
+                    <Form.Label column md="4">
+                      {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number
+                    </Form.Label>
+                    <Col md='8' lg='6' xl='5'>
+                      <Form.Control
+                          value={userLogin}
+                          name="userLogin"
+                          onChange={this.handleChange}
+                          onBlur={this.handleBlur}
+                          size="sm"
+                          readOnly={isViewMode}
+                          plaintext={isViewMode}
+                      />
+                      { error && error.userLogin ? <span className="error-text">{error.userLogin}</span> : null }
+                    </Col>
+                  </Form>
+
+                  <Form as={Row} className={isViewMode ? "" : "pb-10"}>
+                    <Form.Label column md="4">
+                      {isViewMode ? null : <span className='star-color'>*</span>}First Name
+                    </Form.Label>
+                    <Col md='8' lg='6' xl='5'>
+                      <Form.Control
+                          value={firstName}
+                          name="firstName"
+                          onChange={this.handleChange}
+                          onBlur={this.handleBlur}
+                          size="sm"
+                          readOnly={isViewMode}
+                          plaintext={isViewMode}
+                      />
+                      { error && error.firstName ? <span className="error-text">{error.firstName}</span> : null }
+                    </Col>
+                  </Form>
+
+                  <Form as={Row} className={isViewMode ? "" : "pb-10"}>
+                    <Form.Label column md="4">
+                      {isViewMode ? null : <span className='star-color'>*</span>}Last Name
+                    </Form.Label>
+                    <Col md='8' lg='6' xl='5'>
+                      <Form.Control
+                          value={lastName}
+                          name="lastName"
+                          onChange={this.handleChange}
+                          onBlur={this.handleBlur}
+                          size="sm"
+                          readOnly={isViewMode}
+                          plaintext={isViewMode}
+                      />
+                      { error && error.lastName ? <span className="error-text">{error.lastName}</span> : null }
+                    </Col>
+                  </Form>
+
+                  <Form as={Row} style={{alignItems: 'center'}} className={isViewMode ? "" : "pb-10"}>
+                    <Form.Label column md="4">
+                      {isViewMode ? null : <span className='star-color'>*</span>}Date of Birth
+                    </Form.Label>
+                    <Col md='8' lg='6' xl='5'>
+                      {
+                        !isViewMode ?
+                          <DatePicker
+                            placeholderText="MM/DD/YYYY"
+                            selected={dob}
+                            onChange={this.handleDateChange}
+                            peekNextMonth
+                            showMonthDropdown
+                            showYearDropdown
+                            dropdownMode="select"
+                            name="dob"
+                            onBlur={this.handleBlur}
+                            maxDate={new Date()}
+                            className='form-control form-control-sm'
+                            size="sm"
+                          /> :
+                          <span style={{color: '#212529'}}>{dob && moment(dob).format("MM/DD/YYYY")}</span>
+                      }
+                      { error && error.dob ? <span className="error-text">{error.dob}</span> : null }
+                    </Col>
+                  </Form>
+
+                  <Form as={Row} className={isViewMode ? "" : "pb-10"}>
+                    <Form.Label column md="4">
+                      {isViewMode ? null : <span className='star-color'>*</span>}SSN
+                    </Form.Label>
+                    <Col md='8' lg='6' xl='5'>
+                      <Form.Control
+                          value={last4ofSSN}
+                          name="last4ofSSN"
+                          onChange={this.handleSSNInputChange}
+                          onBlur={this.handleSSNBlur}
+                          size="sm"
+                          placeholder='Last 4 digits'
+                          readOnly={isViewMode}
+                          plaintext={isViewMode}
+                      />
+                      { !isViewMode ? <p style={{fontStyle: 'italic', fontSize: '12px'}}>(last 4 digits)</p> : null }
+                      { error && error.last4ofSSN ? <span className="error-text">{error.last4ofSSN}</span> : null }
+                    </Col>
+                  </Form>
+
                 </div>
-              </Col>
-            </> : null
+              </div>
+            </Col> : null
           }
 
           { currentStep === 2 ?
@@ -600,13 +608,13 @@ class ActivateAccount extends React.Component {
                                     <Form.Label column md="4">
                                       {`Question ${i + 1}`}
                                     </Form.Label>
-                                    <Col md="8" className="pt-2">
-                                      <span className="security-question">
-                                        {data && data.challenge}
-                                      </span>
-                                      <Tooltip title="Answer is hidden for security reasons">
-                                        <Icon type="info-circle" className="info-icon"/>
-                                      </Tooltip>
+                                    <Col md="8">
+                                      <Form.Control
+                                        value={data && data.challenge}
+                                        size="sm"
+                                        readOnly={isViewMode}
+                                        plaintext={isViewMode}
+                                      />
                                     </Col>
                                   </Form>
                                 </span>
@@ -678,10 +686,7 @@ class ActivateAccount extends React.Component {
             <div>
               <h5>Set Password</h5>
               <div className="p-2">
-                <p>
-                  <Icon type="info-circle" className="info-icon"/>
-                  <span className="ml-2 font-italic">Password is hidden for security reasons</span>
-                </p>
+                <p>{(password && confirmPassword) ? "Password updated" : 'You have chosen to skip this step'}</p>
               </div>
             </div> : null
         }
@@ -696,7 +701,7 @@ class ActivateAccount extends React.Component {
               </button>
           }
           <div>
-            {/*{ currentStep === 2 ?
+            { currentStep === 2 ?
               <Tooltip title='You can choose to skip this step if you logged in to windows and reset your temporary password.'>
                 <button
                   type="button"
@@ -712,13 +717,13 @@ class ActivateAccount extends React.Component {
                   Skip this step
                 </button>
               </Tooltip> : null
-            }*/}
+            }
             { currentStep === 3 ?
               <button type="button" className="btn btn-success btn-md" onClick={this.handleSubmitBtnClick} disabled={afterSubmit}>
                 { afterSubmit ? <div className="spinner-border spinner-border-sm text-dark"/> : null }
                 {' '} Submit
               </button> :
-              <button type="button" className="btn btn-primary btn-md" onClick={() => this.onValidationCheck(currentStep + 1)} disabled={currentStep === 2 ? (isPwdPassValidate || !confirmPassword || confirmPassword !== password || password.includes("@")) : false}>
+              <button type="button" className="btn btn-primary btn-md" onClick={() => this.onValidationCheck(currentStep + 1)} disabled={currentStep === 2 ? (isPwdPassValidate || !confirmPassword || confirmPassword !== password) : false}>
                 Next
               </button>
             }
@@ -729,4 +734,4 @@ class ActivateAccount extends React.Component {
   }
 }
 
-export default ActivateAccount;
+export default ClaimAccount;

@@ -11,10 +11,10 @@ const MobileMenu = () => {
     <Nav className="mr-auto mobile-menu">
       <Nav.Item>
         <a
-          onClick={() => handleClick("/SelfService/unauth/active-account")}
+          onClick={() => handleClick("/SelfService/unauth/activate-account")}
           className={'nav-link color-white'}
         >
-          Active Account
+          Activate Account
         </a>
       </Nav.Item>
       <Nav.Item>

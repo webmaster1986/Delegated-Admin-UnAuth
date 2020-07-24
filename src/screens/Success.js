@@ -9,7 +9,7 @@ class Success extends React.Component {
                 {
                     state.location === 'activateAccount' ?
                         <>
-                            <h5 className="text-left">Your account has been successfully claimed.</h5>
+                            <h5 className="text-left">Your account has been successfully activated.</h5>
                             { (state.data && state.data.passwordError) ? <div style={{padding: '0 10px'}}>The password could not be updated because of an error. Please use the <a href='/SelfService/unauth/password-reset'>Reset Password </a> page to reset your password.</div> : null }
                         </> :
                         <>

@@ -4,7 +4,7 @@ const axiosInstance = axios.create({
     baseURL: apiEndPoint,
 });
 
-/* const data = {
+ const data = {
      "challengeQuestions": [
          "What is your mother's maiden name?",
          "What is your favorite color?",
@@ -32,7 +32,7 @@ const axiosInstance = axios.create({
      "lastName": "GEORGE",
      "userId": "11111",
      "userLogin": "N1111111"
- }*/
+ }
 
 export class ApiService {
 
@@ -94,11 +94,11 @@ export class ApiService {
     async getEnvironment() {
         return { "environment": "dev" }
         // return await ApiService.getData(`environment.json`);
-        // return await ApiService.getData(`v1/environments`);
+         return await ApiService.getData(`/SelfService/webapi/unauthapi/environments`);
     }
 
     async getUserInformation(userName) {
-        // return userInfo
+        return userInfo
         // return await ApiService.getData(`GetUserInfo.json`);
         // return userName === "1234567" ? await ApiService.getData(`/SelfService/webapi/unauthapi/userInformation?userName=${userName || ''}`) : userInfo;
         return await ApiService.getData(`/SelfService/webapi/unauthapi/userInformation?userName=${userName || ''}`);
@@ -106,18 +106,18 @@ export class ApiService {
 
     /*  Security Question Page Services  */
     async getChallengeQuestions() {
-        // return data
+        return data
         // return await ApiService.getData(`GetQuestions.json`);
         return await ApiService.getData(`/SelfService/webapi/unauthapi/allChallengeQuestions`);
     }
 
     async updateClaim(payload) {
-        // return {"passwordError":"The following password policy rules were not met:Password must not be one of 6 previous passwords.","status":"success","userLogin":"0407143"}
+        return {"passwordError":"The following password policy rules were not met:Password must not be one of 6 previous passwords.","status":"success","userLogin":"0407143"}
         return await ApiService.postMethod(`/SelfService/webapi/unauthapi/activate`, payload);
     }
 
     async getBasicInfo(payload) {
-        // return {"passwordError":"The following password policy rules were not met:Password must not be one of 6 previous passwords.","status":"success","userLogin":"0407143"}
-        return await ApiService.postMethod(`/selfService/webapi/unauthapi/searches/users`, payload);
+        return {"passwordError":"The following password policy rules were not met:Password must not be one of 6 previous passwords.","status":"success","userLogin":"0407143"}
+        return await ApiService.postMethod(`/SelfService/webapi/unauthapi/searches/users`, payload);
     }
 }

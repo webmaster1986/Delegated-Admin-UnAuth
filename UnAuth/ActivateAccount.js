@@ -150,9 +150,12 @@ class ActivateAccount extends React.Component {
     if (name === "userLogin") {
       // if (/^[0-9]/.test(userLogin)) {
       if (userLogin && userLogin.length < 7) {
-        this.setState({
-          userLogin: '0'.repeat(7 - value.length) + value,
-        })
+        const isValue = value.toLowerCase().includes("n")
+        if(!isValue) {
+          this.setState({
+            userLogin: '0'.repeat(7 - value.length) + value,
+          })
+        }
       } /*else if (value.length < 7) {
         error[name] = `Please enter a valid ${name}`
       }*/
@@ -262,7 +265,7 @@ class ActivateAccount extends React.Component {
     let isRequiredEmpty = false
 
     if(currentStep === 0) {
-      isRequiredEmpty = (userLogin === undefined || userLogin.length < 7) ||
+      isRequiredEmpty = !userLogin ||
           (firstName === undefined || firstName.length === 0) ||
           (lastName === undefined || lastName.length === 0) ||
           (dob === undefined || dob.length === 0) ||
@@ -355,7 +358,7 @@ class ActivateAccount extends React.Component {
       password, confirmPassword, challenges, allChallengeQuestions, afterSubmit, currentStep, error, isCheckShow} = this.state;
 
     const isPwdPassValidate = !password || password.includes(firstName) ||  password.includes(lastName) || !/(.*[a-zA-Z]){2,}/.test(password) || password.length < 8 || !/(.*[a-z]){1,}/.test(password) || !/(.*[0-9]){1,}/.test(password) ||
-        !/(.*[$#@^$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin) || password.includes("@")
+        !/(.*[$#@^$!%*?&]){1,}/.test(password) || !/(.*[A-Z]){1,}/.test(password) || !/^[a-zA-Z]/.test(password) || password.includes(userLogin)
 
     let message = null;
     if (errorMessage && Object.keys(errorMessage).length) {
@@ -389,8 +392,8 @@ class ActivateAccount extends React.Component {
                   <div className="p-2">
 
                     <Form as={Row} className={isViewMode ? "" : "pb-10"} >
-                      <Form.Label column md='5' lg='4' xl='4'>
-                        {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number
+                      <Form.Label column md='5' lg='4' xl='4' className="ws-normal">
+                        {isViewMode ? null : <span className='star-color'>*</span>}FISA Ref Number/Internal Employee ID
                         {isViewMode ? null :
                           <div className="text-danger font-italic cursor-pointer fs-10">
                             <span onClick={() => this.setState({isCheckShow: !isCheckShow})}>
@@ -604,7 +607,7 @@ class ActivateAccount extends React.Component {
                                       <span className="security-question">
                                         {data && data.challenge}
                                       </span>
-                                      <Tooltip title="Answer is hidden for security reasons">
+                                      <Tooltip title="Answer hidden for security reason">
                                         <Icon type="info-circle" className="info-icon"/>
                                       </Tooltip>
                                     </Col>
@@ -680,7 +683,7 @@ class ActivateAccount extends React.Component {
               <div className="p-2">
                 <p>
                   <Icon type="info-circle" className="info-icon"/>
-                  <span className="ml-2 font-italic">Password is hidden for security reasons</span>
+                  <span className="ml-2">Password is hidden for security reason</span>
                 </p>
               </div>
             </div> : null
@@ -718,7 +721,7 @@ class ActivateAccount extends React.Component {
                 { afterSubmit ? <div className="spinner-border spinner-border-sm text-dark"/> : null }
                 {' '} Submit
               </button> :
-              <button type="button" className="btn btn-primary btn-md" onClick={() => this.onValidationCheck(currentStep + 1)} disabled={currentStep === 2 ? (isPwdPassValidate || !confirmPassword || confirmPassword !== password || password.includes("@")) : false}>
+              <button type="button" className="btn btn-primary btn-md" onClick={() => this.onValidationCheck(currentStep + 1)} disabled={currentStep === 2 ? (isPwdPassValidate || !confirmPassword || confirmPassword !== password) : false}>
                 Next
               </button>
             }

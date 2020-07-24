@@ -220,14 +220,14 @@ class ForgetPassword extends Component {
 	renderStep() {
 		const {afterSubmit, isLoaderShow, step1Show, isCheckShow, questionNum, firstName, lastName,
 			userName, password, questions, answer, answerError, confirmPassword} = this.state;
-
-		let isNextBtnWork = userName.length < 7 || userName === undefined;
-		let isPwdPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#^$!%*?&])[A-Za-z\d$^#$!%*?&]{8,}/.test(password) &&
+		const isValue = (userName || "").toLowerCase().includes("n")
+		let isNextBtnWork = isValue ? userName.length < 2 : userName.length < 7 || !userName
+		let isPwdPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@^$!%*?&])[A-Za-z\d$@^#$!%*?&]{8,}/.test(password) &&
 			!password.includes(userName) &&
 			/[A-Za-z]/.test(password.substring(0, 1));
 
 		let isSubmitBtnWork = answer === '' || answer === undefined ||
-			!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#$!%*?&])[A-Za-z\d$#$!%*?&]{8,}/.test(password) ||
+			!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$#@$!%*?&])[A-Za-z\d$@#$!%*?&]{8,}/.test(password) ||
 			password.includes(userName) ||
 			!/[A-Za-z]/.test(password.substring(0, 1)) ||
 			confirmPassword !== password;
